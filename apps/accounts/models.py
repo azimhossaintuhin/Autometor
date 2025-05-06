@@ -5,7 +5,7 @@ from .manager import CustomUserManager
 
 
 class User(AbstractUser):
-    
+    username = None
     phone = models.CharField(max_length=15, unique=True)
     email = models.EmailField(unique=True)
     is_verified = models.BooleanField(default=False)
@@ -15,7 +15,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     def __str__(self):
-        return self.username
+        return self.email
 
 
 class Userprofile(models.Model):
