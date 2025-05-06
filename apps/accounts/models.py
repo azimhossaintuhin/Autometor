@@ -4,8 +4,8 @@ from .manager import CustomUserManager
 # Create your models here.
 
 
-class Users(AbstractUser):
-    username = None
+class User(AbstractUser):
+    
     phone = models.CharField(max_length=15, unique=True)
     email = models.EmailField(unique=True)
     is_verified = models.BooleanField(default=False)
@@ -19,7 +19,7 @@ class Users(AbstractUser):
 
 
 class Userprofile(models.Model):
-    user = models.OneToOneField(Users, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     address = models.TextField()
@@ -37,7 +37,7 @@ class Token(models.Model):
         ("v", "verification"),
         ("p", "password_reset"),
     ]
-    user = models.OneToOneField(Users, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -46,7 +46,7 @@ class Token(models.Model):
 
 
 class UserWallet(models.Model):
-    user = models.OneToOneField(Users, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     wallet_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
