@@ -91,6 +91,8 @@ class LogoutApiView(APIView):
         return response
 
 
+
+
 class UserProfileApiView(APIView):
     permission_classes = [IsAuthenticated]
 
