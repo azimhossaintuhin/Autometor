@@ -18,8 +18,12 @@ class User(AbstractUser):
         return self.email
 
 
+
+
+
 class Userprofile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE ,related_name="userprofile")
+    github_token = models.CharField(max_length=255) 
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     address = models.TextField()

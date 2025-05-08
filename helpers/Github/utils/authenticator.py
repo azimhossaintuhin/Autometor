@@ -11,7 +11,7 @@ class Validate_Token:
     def validate_token(self) -> bool:
         response = requests.get(self.url, headers=self.headers)
         if response.status_code == 200:
-            data = json.load(response.json())
+            data = response.json()
             return data
         else:
             return False

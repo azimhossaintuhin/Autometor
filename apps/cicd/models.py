@@ -21,3 +21,4 @@ class Workflow(models.Model):
     )
     repo = models.CharField(max_length=2555)
     framework = models.CharField(max_length=255)
+    
