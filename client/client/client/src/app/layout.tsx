@@ -1,8 +1,11 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import QueryClientProviderWrapper from "@/context/Querycilent";
 
+// Fonts setup (if any)
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,14 +26,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Initialize the query client
+
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        {/* Provide the QueryClient to the application */}
+        <QueryClientProviderWrapper>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryClientProviderWrapper>
       </body>
     </html>
   );
