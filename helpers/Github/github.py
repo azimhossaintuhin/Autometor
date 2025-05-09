@@ -76,3 +76,28 @@ class github:
             return str(e)
     
     
+    def create_env_variables(self, reponame, variables):
+        try:
+            for key, value in variables.items():
+                url = f"{API_URL}/repos/{self.username}/{reponame}/actions/variables"  # fixed typo and removed trailing slash
+
+                payload = {
+                    "name": key,
+                    "value": str(value)
+                }
+
+                response = requests.post(url, headers=self.headers, json=payload)
+
+                if response.status_code == 201:
+                    print(f"✅ Created variable: {key}")
+                elif response.status_code == 409:
+                    print(f"⚠️ Variable already exists: {key}")
+                else:
+                    print(f"❌ Failed to create {key}: {response.status_code} - {response.text}")
+
+            return True  # moved outside the loop
+
+        except Exception as e:
+            print(f"Exception: {str(e)}")
+            return str(e)
+        

@@ -43,17 +43,15 @@ class  getRepo(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         
-        
+#====== Create A Workflow ======#
 class createWorkflow(APIView):
     permission_classes = [IsAuthenticated]
     
     def _generate_workflow_file(self, file_name, data):
         try:
-            # Use Django's template loader to find and render the template
             rendered_template = render_to_string(file_name, data)
             if not rendered_template:
                 raise Exception("Template rendering failed - empty result")
-                
             return rendered_template
             
         except Exception as e:
@@ -70,4 +68,17 @@ class createWorkflow(APIView):
             else:
                 return Response({"message": "Workflow created successfully"}, status=status.HTTP_200_OK)
                 
-       
+    
+
+#====== Set Environment Variables ======#
+class setEnvVariables(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            
+            github_instance = github(request.user.userprofile.github_token)
+            variables = github_instance.create_env_variables(kwargs.get("repo_name"), request.data)
+            return Response({"message": "Environment variables set successfully"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

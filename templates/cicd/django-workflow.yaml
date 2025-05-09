@@ -34,15 +34,15 @@ jobs:
             -name : SSh  To  Server
             uses: appleboy/scp-action@master
             with:
-              host: ${{ secrets.HOST }}
-              username: ${{ secrets.USERNAME }}
-              key: ${{ secrets.SSH_KEY }}
+              host: ${{ varts.HOST }}
+              username: ${{ vars.USERNAME }}
+              key: ${{ vars.SSH_KEY }}
               port: 22
               source: "."
             
             - name: Deploy to server
             run: |
-              ssh -i ${{ secrets.SSH_KEY }} -p 22 ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+              ssh -i ${{ vars.SSH_KEY }} -p 22 ${{ vars.USERNAME }}@${{ vars.HOST }} << 'EOF'
                 cd {{server_path}}
                 git pull origin {{ branch }}
                 source venv/bin/activate
