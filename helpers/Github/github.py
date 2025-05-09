@@ -83,7 +83,8 @@ class github:
 
                 payload = {
                     "name": key,
-                    "value": str(value)
+                    "value": str(value),
+                    
                 }
 
                 response = requests.post(url, headers=self.headers, json=payload)
@@ -100,4 +101,21 @@ class github:
         except Exception as e:
             print(f"Exception: {str(e)}")
             return str(e)
+    
+    def get_env_variables(self, reponame):
+        url = f"{API_URL}/repos/{self.username}/{reponame}/actions/variables"
+        response = requests.get(url, headers=self.headers)
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            return False
+
+    def delete_env_variables(self, reponame, key):
         
+        url = f"{API_URL}/repos/{self.username}/{reponame}/actions/variables/{key}"
+        response = requests.delete(url, headers=self.headers)
+        if response.status_code == 204:
+            return True
+        else:
+            return False

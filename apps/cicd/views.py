@@ -8,6 +8,8 @@ from .serializers import GitRepoSerializer
 from  django.conf import settings
 from django.template.loader import render_to_string
 
+
+
 #====== Get All The Public Repositories ======#
 class getRepos(APIView):
     permission_classes = [IsAuthenticated]
@@ -82,3 +84,20 @@ class setEnvVariables(APIView):
             return Response({"message": "Environment variables set successfully"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+#====== Get Environment Variables ======#
+class getEnvVariables(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        github_instance = github(request.user.userprofile.github_token)
+        variables = github_instance.get_env_variables(kwargs.get("repo_name"))
+        return Response(variables, status=status.HTTP_200_OK)
+
+#====== Delete Environment Variables ======#
+class deleteEnvVariables(APIView):
+    permission_classes = [IsAuthenticated]
+    def delete(self, request, *args, **kwargs):
+        key = kwargs.get("key")
+        github_instance = github(request.user.userprofile.github_token)
+        github_instance.delete_env_variables(kwargs.get("repo_name"),key)
+        return Response({"message": "Environment variables deleted successfully"}, status=status.HTTP_200_OK)
