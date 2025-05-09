@@ -13,7 +13,6 @@ from django.template.loader import render_to_string
 #====== Get All The Public Repositories ======#
 class getRepos(APIView):
     permission_classes = [IsAuthenticated]
-        
     def get(self, request):
         try:
             token = request.user.userprofile.github_token
@@ -93,6 +92,8 @@ class getEnvVariables(APIView):
         variables = github_instance.get_env_variables(kwargs.get("repo_name"))
         return Response(variables, status=status.HTTP_200_OK)
 
+
+
 #====== Delete Environment Variables ======#
 class deleteEnvVariables(APIView):
     permission_classes = [IsAuthenticated]
@@ -101,3 +102,5 @@ class deleteEnvVariables(APIView):
         github_instance = github(request.user.userprofile.github_token)
         github_instance.delete_env_variables(kwargs.get("repo_name"),key)
         return Response({"message": "Environment variables deleted successfully"}, status=status.HTTP_200_OK)
+    
+    
