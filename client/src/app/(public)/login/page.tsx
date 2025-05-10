@@ -3,21 +3,23 @@ import React, { useState } from 'react'
 import loginbg from "@/assets/login.jpg"
 import baseApi from '@/utils/api'
 import { useMutation } from '@tanstack/react-query'
+import { TailSpin } from 'react-loader-spinner'
+import { useRouter } from 'next/navigation'
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   })
-
+  const router = useRouter()
   const mutation = useMutation({
     mutationKey: ["login"],
     mutationFn: (data: any) => baseApi.post("/login/", data),
     onSuccess: (data) => {
-      console.log(data)
+      router.replace("/profile")
     },
     onError: (error) => {
-      console.log(error)
+        console.log(error)
     }
   })
 
@@ -43,7 +45,9 @@ const Login = () => {
             <label htmlFor="password" className='text-slate-700 font-bold'>Password</label>
             <input value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} type="password" placeholder='Enter your password' name="password" id="password" className='border-2 border-slate-300 rounded-md px-3 py-2 placeholder:text-slate-400' />
           </div>
-          <button type="submit" className='bg-green-500 text-white font-bold py-2 px-4 rounded-md w-full' >Login</button>
+          <button type="submit" className='bg-green-500 text-white font-bold py-2 px-4 rounded-md w-full' >
+            {mutation.isPending ? <div className='flex items-center justify-center'><TailSpin color="#fff" height={20} width={20}   /></div> : "Login"}
+          </button>
         </form>
       </div>
 
