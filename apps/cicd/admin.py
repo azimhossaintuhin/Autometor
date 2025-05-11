@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+models = [Language, Framework, Branch, Workflow]
+
+for model in models:
+    admin.site.register(model)

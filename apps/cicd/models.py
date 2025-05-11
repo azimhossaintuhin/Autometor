@@ -2,6 +2,9 @@ from django.db import models
 from apps.accounts.models import User
 
 
+
+
+
 class Branch(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     repo = models.CharField(max_length=2555)
@@ -21,4 +24,22 @@ class Workflow(models.Model):
     )
     repo = models.CharField(max_length=2555)
     framework = models.CharField(max_length=255)
+    
+class Language(models.Model):
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Framework(models.Model):
+    language = models.ForeignKey(Language, on_delete=models.CASCADE ,  related_name="framework")
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+    
+    
     
