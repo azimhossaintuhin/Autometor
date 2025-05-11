@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-
+from .models import Framework
 
 class GitRepoSerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -22,6 +22,8 @@ class GitRepoSerializer(serializers.Serializer):
     owner = serializers.SerializerMethodField()
     avatar_url = serializers.SerializerMethodField()
 
+    
+
     def get_owner(self, obj):
         return obj.get("owner", {}).get("login", "")
 
@@ -31,6 +33,9 @@ class GitRepoSerializer(serializers.Serializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
 
+            
+    
+    
         # Include additional context-based info like branches (optional)
         if self.context.get("branches"):
             response["branches"] = [
@@ -38,3 +43,9 @@ class GitRepoSerializer(serializers.Serializer):
             ]
 
         return response
+
+
+class FrameworkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Framework
+        fields = "__all__"

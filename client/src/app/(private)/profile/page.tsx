@@ -5,11 +5,12 @@ import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { RiGitRepositoryCommitsLine } from 'react-icons/ri';
 import { MdAccountBalanceWallet } from 'react-icons/md';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import RepoCards from '@/components/custom/RepoCards';
 import baseApi from '@/utils/api';
 import { TailSpin } from 'react-loader-spinner';
-
+import { useRouter } from 'next/navigation';
+import { BiLogOut } from 'react-icons/bi';
 interface Repo {
   id: number;
   name: string;
@@ -22,7 +23,8 @@ interface Repo {
 }
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user} = useAuth();
   const userData = user?.data;
 
   const {
@@ -37,6 +39,15 @@ const UserProfile = () => {
       return res.data.data;
     },
     enabled: false,
+  });
+
+  const { mutate: logout, isPending: logoutLoading } = useMutation({
+    mutationFn: async () => {
+      await baseApi.post('/logout/');
+    },
+    onSuccess: () => {
+      router.replace('/login');
+    },
   });
 
   return (
@@ -55,6 +66,12 @@ const UserProfile = () => {
         <div className="text-center mt-2">
           <h1 className="text-2xl font-bold">{userData?.full_name}</h1>
           <p className="text-sm text-gray-500">{userData?.email || 'demo@gmail.com'}</p>
+         <button className='bg-emerald-500 px-1 py-1 rounded-md flex mx-auto items-center gap-2 text-white' onClick={()=>{
+          logout()
+         }}>
+          
+         {logoutLoading ? <TailSpin height="20" width="20" color="#fff"  ariaLabel="loading" /> : <BiLogOut className='text-xl' />}
+         </button>
         </div>
       </div>
 

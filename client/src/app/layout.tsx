@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import QueryClientProviderWrapper from "@/context/Querycilent";
-
+import { ToastContainer } from "react-toastify";
 // Fonts setup (if any)
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +36,10 @@ export default function RootLayout({
       >
         {/* Provide the QueryClient to the application */}
         <QueryClientProviderWrapper>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+          <ToastContainer />
+            {children}
+          </AuthProvider>
         </QueryClientProviderWrapper>
       </body>
     </html>

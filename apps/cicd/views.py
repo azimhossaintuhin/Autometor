@@ -4,9 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from helpers.Github.github import github
-from .serializers import GitRepoSerializer
+from .serializers import GitRepoSerializer , FrameworkSerializer
 from django.conf import settings
-from django.template.loader import render_to_string
+from  .models import Language, Workflow
 
 
 # ====== Get All The Public Repositories ======#
@@ -45,34 +45,56 @@ class getRepo(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class getFrameworks(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            language = Language.objects.prefetch_related('framework').filter(name=kwargs.get("language")).first()
+            if not language:
+                return Response({"error": "Language not found"}, status=status.HTTP_404_NOT_FOUND)
+                
+            frameworks = language.framework.all()
+            serializer = FrameworkSerializer(frameworks, many=True)
+            return Response( serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
 # ====== Create A Workflow ======#
 class createWorkflow(APIView):
     permission_classes = [IsAuthenticated]
 
-    def _generate_workflow_file(self, file_name, data):
-        try:
-            rendered_template = render_to_string(file_name, data)
-            if not rendered_template:
-                raise Exception("Template rendering failed - empty result")
-            return rendered_template
-
-        except Exception as e:
-            raise Exception(f"Error generating workflow file: {str(e)}")
-
+    def _get_workflow_file(self, framework):
+        workflow_file = os.path.join(settings.BASE_DIR, "templates", "cicd", f"{framework}-workflow.yaml")
+        if not os.path.exists(workflow_file):
+            return Response({"error": "Workflow file not found"}, status=status.HTTP_404_NOT_FOUND)
+        return workflow_file
+    
     def post(self, request, *args, **kwargs):
         data = request.data
-        workflow_file = self._generate_workflow_file("cicd/django-workflow.yaml", data)
-        github_instance = github(request.user.userprofile.github_token)
-        workflow = github_instance.add_workflow(kwargs.get("repo_name"), workflow_file)
-        if workflow == "Workflow already exists":
-            return Response(
-                {"message": "Workflow already exists", "data": "already exists"},
-                status=status.HTTP_200_OK,
-            )
-        else:
-            return Response(
-                {"message": "Workflow created successfully"}, status=status.HTTP_200_OK
-            )
+        user = request.user
+        try:
+            workflow_file = self._get_workflow_file(data.get("framework"))
+            with open(workflow_file, "r") as file:
+                workflow_content = file.read()
+            github_instance = github(request.user.userprofile.github_token)
+            workflow = github_instance.add_workflow(kwargs.get("repo_name"), workflow_content)
+            workflow, created = Workflow.objects.get_or_create(user=user, repo_name=kwargs.get("repo_name"), framework=data.get("framework"), )        
+            
+            if workflow == "Workflow already exists":
+                return Response(
+                    {"message": "Workflow already exists", "data": "already exists"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": "Workflow created successfully" ,"data":workflow}, status=status.HTTP_200_OK
+                )
+        except Exception as e:
+            print(str(e))
+            return Response({"errors":str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ====== Set Environment Variables ======#
@@ -86,10 +108,11 @@ class setEnvVariables(APIView):
                 kwargs.get("repo_name"), request.data
             )
             return Response(
-                {"message": "Environment variables set successfully"},
+                {"message": "Environment variables set successfully", "data": variables},
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
+            print(str(e))
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 

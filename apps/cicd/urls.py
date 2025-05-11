@@ -5,7 +5,8 @@ from .views import (
     createWorkflow,
     setEnvVariables,
     getEnvVariables,
-    deleteEnvVariables
+    deleteEnvVariables,
+    getFrameworks
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path("set-env-variables/<str:repo_name>/", setEnvVariables.as_view(), name="set-env-variables"),
     path("get-env-variables/<str:repo_name>/", getEnvVariables.as_view(), name="get-env-variables"),
     path("delete-env-variables/<str:repo_name>/<str:key>/", deleteEnvVariables.as_view(), name="delete-env-variables"),
+    path("get-frameworks/<str:language>/", getFrameworks.as_view(), name="get-frameworks"),
 ]

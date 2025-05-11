@@ -1,4 +1,4 @@
-name: nestjs-deployment
+name: react-deployment
 
 on:
   push:
@@ -27,6 +27,9 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          # Add other environment variables your React app needs
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1
@@ -40,5 +43,10 @@ jobs:
             git pull origin main
             npm ci
             npm run build
-            pm2 restart ${{ env.SERVICE_NAME }}
+            # Copy build files to nginx directory
+            sudo cp -r build/* /var/www/html/
+            # Set proper permissions
+            sudo chown -R www-data:www-data /var/www/html/
+            sudo chmod -R 755 /var/www/html/
+            # Restart nginx
             sudo systemctl restart nginx

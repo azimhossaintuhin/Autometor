@@ -1,0 +1,56 @@
+name: nextjs-deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          # Add other environment variables your Next.js app needs
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ env.HOST }}
+          username: ${{ env.USERNAME }}
+          key: ${{ env.SSH_KEY }}
+          port: 22
+          script: |
+            cd ${{ env.PROJECT_PATH }}
+            git pull origin main
+            npm ci
+            npm run build
+            # For Next.js, we need to handle both the build and the server
+            if [ -f "package.json" ]; then
+              # If using PM2
+              pm2 restart ${{ env.SERVICE_NAME }}
+            fi
+            # If using standalone output
+            if [ -d ".next/standalone" ]; then
+              cd .next/standalone
+              pm2 restart ${{ env.SERVICE_NAME }}
+            fi
+            sudo systemctl restart nginx

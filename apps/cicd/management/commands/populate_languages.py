@@ -12,7 +12,11 @@ class Command(BaseCommand):
             },
             {
                 "language": "JavaScript",
-                "frameworks": ["React", "Vue", "Angular", "Next.js"]
+                "frameworks": ["React", "Vue", "Angular", "Next.js" , "Express" , "Nest.js"]
+            },
+            {
+                "language": "TypeScript",
+                "frameworks": ["React", "Vue", "Angular", "Next.js" , "Express" , "Nest.js"]
             },
             {
                 "language": "Java",

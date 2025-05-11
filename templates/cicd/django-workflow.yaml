@@ -3,9 +3,7 @@ name: dautometor-django
 on:
   push:
     branches:
-      {%for branch  in  push_branches%}
-        - {{ branch }}
-        {%endfor%}
+      - main
     workflow_dispatch:
 
 jobs:
@@ -43,12 +41,12 @@ jobs:
               port: 22
               run: |
                 cd {{env.PROJECT_PATH}}
-                git pull origin {{ env.BRANCH }}
+                git pull origin main
                 source venv/bin/activate
                 pip install -r requirements.txt
                 python manage.py migrate
                 python manage.py collectstatic --noinput
-                sudo systemctl restart {{ vars.SERVICE_NAME }}
+                sudo systemctl restart {{ env.SERVICE_NAME }}
                 sudo systemctl restart nginx
 
             

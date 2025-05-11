@@ -3,24 +3,33 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import baseApi from '@/utils/api';
-
+import { useRouter } from 'next/navigation';
 interface AuthContextType {
     user: any;
     loading: boolean;
     error: string | null;
+                
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const router = useRouter();
     const { data, isLoading, error } = useQuery({
         queryKey: ['user'],
         queryFn: async () => {
             const response = await baseApi.get('/user/me/');
             return response.data;
         },
-       
+        retry: false,
     });
+
+    const logout = async () => {
+        const response = await baseApi.post('/logout/');
+        if (response.status === 200) {
+            router.replace("/login")
+        }
+    }
 
     return (
         <AuthContext.Provider value={{ user: data, loading: isLoading, error: error ? String(error) : null }}>
