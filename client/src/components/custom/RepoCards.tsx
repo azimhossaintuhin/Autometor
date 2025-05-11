@@ -3,7 +3,7 @@
 import React from 'react';
 import { FaStar, FaCodeBranch } from 'react-icons/fa';
 import { GoRepo } from 'react-icons/go';
-
+import Link from 'next/link';
 interface Repo {
     id: number;
     name: string;
@@ -21,9 +21,11 @@ const RepoCards: React.FC<{ repo: Repo }> = ({ repo }) => {
             {/* Header */}
             <div className="flex items-center gap-2 mb-2">
                 <GoRepo className="text-lg text-gray-700 dark:text-gray-300" />
-                <h2 className="text-lg font-semibold text-blue-600 dark:text-blue-400 break-words">
-                    {repo.name}
-                </h2>
+                <Link href={`/repo/${repo.name}`}>
+                    <h2 className="text-lg font-semibold text-blue-600 dark:text-blue-400 break-words">
+                        {repo.name}
+                    </h2>
+                </Link>
             </div>
 
             {/* Description */}

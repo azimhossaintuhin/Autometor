@@ -18,14 +18,10 @@ class getRepos(APIView):
             token = request.user.userprofile.github_token
             github_instance = github(token)
             repos = github_instance.get_repos()
-            
-            public_repos = list(
-                filter(lambda repos: repos.get("private") == False, repos)
-            )
 
-            total_repos = len(public_repos)
+            total_repos = len(repos)
             serializer = GitRepoSerializer(
-                public_repos, many=True, context={"total_repos": total_repos}
+                repos, many=True, context={"total_repos": total_repos}
             )
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
