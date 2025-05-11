@@ -40,8 +40,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Userprofile
         fields = [
-            "first_name",
-            "last_name",
+            "full_name",
+            "git_username",
+            "avatar_url",
             "address",
             "city",
             "state",

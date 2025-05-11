@@ -18,8 +18,15 @@ class github:
         self.avatar_url = self.user_data["avatar_url"]
         self.headers = {"Authorization": f"Bearer {self.token}"}
 
+    def get_user_data(self):
+        url = f"{API_URL}/user"
+        response = requests.get(url, headers=self.headers)
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            return False
 
-    
     def get_repos(self):
         try:
             url = f"{API_URL}/users/{self.username}/repos"
@@ -27,7 +34,7 @@ class github:
             response = requests.get(url, headers=self.headers)
             if response.status_code == 200:
                 data = response.json()
-                
+
                 return data
             else:
                 return False
@@ -53,12 +60,10 @@ class github:
         else:
             return False
 
-   
-
-    def add_workflow(self, reponame,content):
+    def add_workflow(self, reponame, content):
         try:
             url = f"{API_URL}/repos/{self.username}/{reponame}/contents/.github/workflows/workflow.yaml"
-            
+
             body = {
                 "message": "Add daautometor_workflow.yaml",
                 "content": base64.b64encode(content.encode()).decode(),
@@ -66,7 +71,7 @@ class github:
             }
             response = requests.put(url, headers=self.headers, json=body)
             print("response", response.json())
-            if  response.status_code == 201:
+            if response.status_code == 201:
                 data = response.json()
                 return data
             if response.status_code == 422:
@@ -74,8 +79,7 @@ class github:
         except Exception as e:
             print(str(e))
             return str(e)
-    
-    
+
     def create_env_variables(self, reponame, variables):
         try:
             for key, value in variables.items():
@@ -84,7 +88,6 @@ class github:
                 payload = {
                     "name": key,
                     "value": str(value),
-                    
                 }
 
                 response = requests.post(url, headers=self.headers, json=payload)
@@ -94,14 +97,16 @@ class github:
                 elif response.status_code == 409:
                     print(f"⚠️ Variable already exists: {key}")
                 else:
-                    print(f"❌ Failed to create {key}: {response.status_code} - {response.text}")
+                    print(
+                        f"❌ Failed to create {key}: {response.status_code} - {response.text}"
+                    )
 
             return True  # moved outside the loop
 
         except Exception as e:
             print(f"Exception: {str(e)}")
             return str(e)
-    
+
     def get_env_variables(self, reponame):
         url = f"{API_URL}/repos/{self.username}/{reponame}/actions/variables"
         response = requests.get(url, headers=self.headers)
@@ -112,7 +117,6 @@ class github:
             return False
 
     def delete_env_variables(self, reponame, key):
-        
         url = f"{API_URL}/repos/{self.username}/{reponame}/actions/variables/{key}"
         response = requests.delete(url, headers=self.headers)
         if response.status_code == 204:

@@ -1,36 +1,41 @@
-import os 
+import os
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from  helpers.Github.github import github
+from helpers.Github.github import github
 from .serializers import GitRepoSerializer
-from  django.conf import settings
+from django.conf import settings
 from django.template.loader import render_to_string
 
 
-
-#====== Get All The Public Repositories ======#
+# ====== Get All The Public Repositories ======#
 class getRepos(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
         try:
             token = request.user.userprofile.github_token
             github_instance = github(token)
             repos = github_instance.get_repos()
-            public_repos =  list(filter(lambda repos: repos.get("private") == False, repos))
+            
+            public_repos = list(
+                filter(lambda repos: repos.get("private") == False, repos)
+            )
+
             total_repos = len(public_repos)
-            serializer = GitRepoSerializer(public_repos, many=True , context={"total_repos": total_repos})
+            serializer = GitRepoSerializer(
+                public_repos, many=True, context={"total_repos": total_repos}
+            )
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        
-        
-#====== Get A Single Repository ======#
-class  getRepo(APIView):
+
+
+# ====== Get A Single Repository ======#
+class getRepo(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request, *args, **kwargs):
         try:
             token = request.user.userprofile.github_token
@@ -38,69 +43,79 @@ class  getRepo(APIView):
             repo = github_instance.get_repo(kwargs.get("repo_name"))
             branches = github_instance.get_branches(kwargs.get("repo_name"))
             serializer = GitRepoSerializer(repo, context={"branches": branches})
-        
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        
-#====== Create A Workflow ======#
+
+
+# ====== Create A Workflow ======#
 class createWorkflow(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def _generate_workflow_file(self, file_name, data):
         try:
             rendered_template = render_to_string(file_name, data)
             if not rendered_template:
                 raise Exception("Template rendering failed - empty result")
             return rendered_template
-            
+
         except Exception as e:
             raise Exception(f"Error generating workflow file: {str(e)}")
-    
-    def post(self, request, *args, **kwargs):
-       
-            data = request.data
-            workflow_file = self._generate_workflow_file("cicd/django-workflow.yaml", data)
-            github_instance = github(request.user.userprofile.github_token)
-            workflow = github_instance.add_workflow(kwargs.get("repo_name"), workflow_file)
-            if workflow == "Workflow already exists":
-                return Response({"message": "Workflow already exists","data":"already exists"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "Workflow created successfully"}, status=status.HTTP_200_OK)
-                
-    
 
-#====== Set Environment Variables ======#
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        workflow_file = self._generate_workflow_file("cicd/django-workflow.yaml", data)
+        github_instance = github(request.user.userprofile.github_token)
+        workflow = github_instance.add_workflow(kwargs.get("repo_name"), workflow_file)
+        if workflow == "Workflow already exists":
+            return Response(
+                {"message": "Workflow already exists", "data": "already exists"},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {"message": "Workflow created successfully"}, status=status.HTTP_200_OK
+            )
+
+
+# ====== Set Environment Variables ======#
 class setEnvVariables(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, *args, **kwargs):
         try:
-            
             github_instance = github(request.user.userprofile.github_token)
-            variables = github_instance.create_env_variables(kwargs.get("repo_name"), request.data)
-            return Response({"message": "Environment variables set successfully"}, status=status.HTTP_200_OK)
+            variables = github_instance.create_env_variables(
+                kwargs.get("repo_name"), request.data
+            )
+            return Response(
+                {"message": "Environment variables set successfully"},
+                status=status.HTTP_200_OK,
+            )
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-#====== Get Environment Variables ======#
+
+# ====== Get Environment Variables ======#
 class getEnvVariables(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         github_instance = github(request.user.userprofile.github_token)
         variables = github_instance.get_env_variables(kwargs.get("repo_name"))
         return Response(variables, status=status.HTTP_200_OK)
 
 
-
-#====== Delete Environment Variables ======#
+# ====== Delete Environment Variables ======#
 class deleteEnvVariables(APIView):
     permission_classes = [IsAuthenticated]
+
     def delete(self, request, *args, **kwargs):
         key = kwargs.get("key")
         github_instance = github(request.user.userprofile.github_token)
-        github_instance.delete_env_variables(kwargs.get("repo_name"),key)
-        return Response({"message": "Environment variables deleted successfully"}, status=status.HTTP_200_OK)
-    
-    
+        github_instance.delete_env_variables(kwargs.get("repo_name"), key)
+        return Response(
+            {"message": "Environment variables deleted successfully"},
+            status=status.HTTP_200_OK,
+        )

@@ -6,6 +6,7 @@ from .serializers import RegistrationSerializer, UserProfileSerializer
 from .models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from helpers.Github.github import github
 
 
 class RegistrationApiview(APIView):
@@ -91,8 +92,6 @@ class LogoutApiView(APIView):
         return response
 
 
-
-
 class UserProfileApiView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -101,16 +100,3 @@ class UserProfileApiView(APIView):
         user_profile = user.userprofile
         serializer = UserProfileSerializer(user_profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def patch(self, request):
-        user = request.user
-        user_profile = user.userprofile
-        serializer = UserProfileSerializer(
-            user_profile, data=request.data, partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
