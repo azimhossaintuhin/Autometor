@@ -6,11 +6,6 @@ on:
       {%for branch  in  push_branches%}
         - {{ branch }}
         {%endfor%}
-  pull_request:
-    branches:
-      {%for branch  in  pull_request_branches%}
-        - {{ branch }}
-        {%endfor%}
     workflow_dispatch:
 
 jobs:
@@ -23,7 +18,7 @@ jobs:
           - name: Set up Python
             uses: actions/setup-python@v2
             with:
-              python-version: {{version}}
+              python-version: 3.1
             
             - name: Install dependencies
             run: |
@@ -42,13 +37,13 @@ jobs:
            - name: SSh  TO Server 
             uses : appleboy/ssh-action@v1
             with:
-              host: ${{ vars.HOST }}
-              username: ${{ vars.USERNAME }}
-              key: ${{ vars.SSH_KEY }}
+              host:${{env.HOST}}
+              username: ${{ env.USERNAME }}
+              key: ${{ env.SSH_KEY }}
               port: 22
               run: |
-                cd {{vars.PROJECT_PATH}}
-                git pull origin {{ vars.BRANCH }}
+                cd {{env.PROJECT_PATH}}
+                git pull origin {{ env.BRANCH }}
                 source venv/bin/activate
                 pip install -r requirements.txt
                 python manage.py migrate
