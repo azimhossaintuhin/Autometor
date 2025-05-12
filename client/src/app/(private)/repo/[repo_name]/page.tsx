@@ -55,8 +55,8 @@ const RepoCiCD = () => {
     },
     enabled: !!data?.language,
   })
-
-  // Create Workflow
+  
+  // Create Workf low
   const { mutate: createWorkflow, isPending: createWorkflowLoading, error: createWorkflowError } = useMutation({
     mutationFn: async () => {
       const response = await baseApi.post(`/create-workflow/${repo_name}/`, {
@@ -156,7 +156,7 @@ const RepoCiCD = () => {
             }}>
               <div className='w-full p-2 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-5'>
                 <div className="flex flex-col justify-start mb-3">
-                  <label htmlFor="framework" className='text-slate-700 font-bold mb-1'>Branches</label>
+                  <label htmlFor="framework" className='text-slate-700 font-bold mb-1'>Framework</label>
                   <select
                     name="framework"
                     id="framework"
@@ -166,7 +166,7 @@ const RepoCiCD = () => {
                     }}
                   >
                     <option value="">Select {data?.language} Framework</option>
-                    {frameworks.map((framework:{name:string,id:number}) => (
+                    {frameworks && frameworks.map((framework:{name:string,id:number}) => (
                       <option key={framework.id} value={framework.name}>{framework.name}</option>
                     ))}
                   </select>   

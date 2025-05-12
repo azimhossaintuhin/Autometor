@@ -1,12 +1,11 @@
 import React from 'react'
-import ProtectedRoute from '@/utils/ProtectedRoute'
 import Navbar from '@/components/custom/Navbar'
 const layout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <ProtectedRoute>
+    <div>
       <Navbar />
       {children}
-    </ProtectedRoute>
+    </div>
   )
 }
 

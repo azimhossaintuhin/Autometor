@@ -1,30 +1,32 @@
-"use client"
-import { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import { TailSpin } from "react-loader-spinner";
+'use client';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+interface ProtectedRouteProps {
+    children: React.ReactNode;
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const { user, loading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        if (!loading && !user?.status) {
-            router.replace("/login");
+        if (!loading && !user) {
+            router.replace('/login');
         }
-    }, [loading, user?.status, router]);
+    }, [user, loading, router]);
 
     if (loading) {
-        console.log("loading")  
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <TailSpin color="#000" height={50} width={50} />
-            </div>
-        );
+        return <div>Loading...</div>;
     }
-    console.log(user)
+
+    if (!user) {
+        return null;
+    }
 
     return <>{children}</>;
 };
 
-export default ProtectedRoute;
+export default ProtectedRoute; 

@@ -69,19 +69,20 @@ class createWorkflow(APIView):
     def _get_workflow_file(self, framework):
         workflow_file = os.path.join(settings.BASE_DIR, "templates", "cicd", f"{framework}-workflow.yaml")
         if not os.path.exists(workflow_file):
-            return Response({"error": "Workflow file not found"}, status=status.HTTP_404_NOT_FOUND)
+            return None
         return workflow_file
     
     def post(self, request, *args, **kwargs):
         data = request.data
         user = request.user
         try:
+            workflow, created = Workflow.objects.get_or_create(user=user, repo_name=kwargs.get("repo_name"), framework=data.get("framework"))
             workflow_file = self._get_workflow_file(data.get("framework"))
             with open(workflow_file, "r") as file:
                 workflow_content = file.read()
             github_instance = github(request.user.userprofile.github_token)
             workflow = github_instance.add_workflow(kwargs.get("repo_name"), workflow_content)
-            workflow, created = Workflow.objects.get_or_create(user=user, repo_name=kwargs.get("repo_name"), framework=data.get("framework"), )        
+                 
             
             if workflow == "Workflow already exists":
                 return Response(

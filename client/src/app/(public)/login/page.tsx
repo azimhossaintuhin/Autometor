@@ -5,6 +5,7 @@ import baseApi from '@/utils/api'
 import { useMutation } from '@tanstack/react-query'
 import { TailSpin } from 'react-loader-spinner'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -12,10 +13,12 @@ const Login = () => {
     password: "",
   })
   const router = useRouter()
+  const { user, loading,invalidateUser} = useAuth();
   const mutation = useMutation({
     mutationKey: ["login"],
     mutationFn: (data: any) => baseApi.post("/login/", data),
     onSuccess: (data) => {
+      invalidateUser();
       router.replace("/profile")
     },
     onError: (error) => {

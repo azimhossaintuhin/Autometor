@@ -4,14 +4,15 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const PublicLayout = ({children}: {children: React.ReactNode}) => {
-    const { user } = useAuth();
-    const router = useRouter();
+    // const { user,loading } = useAuth();
+    // const router = useRouter();
 
-    useEffect(() => {
-        if (user) {
-            router.replace("/profile");
-        }
-    }, [user, router]);
+    // useEffect(() => {
+
+    //     if (user && !loading) {
+    //         router.replace("/profile");
+    //     }
+    // }, [user, router, loading]);
 
     return <>{children}</>;
 }

@@ -24,7 +24,7 @@ interface Repo {
 
 const UserProfile = () => {
   const router = useRouter();
-  const { user} = useAuth();
+  const { user , loading} = useAuth();
   const userData = user?.data;
 
   const {
@@ -49,6 +49,14 @@ const UserProfile = () => {
       router.replace('/login');
     },
   });
+
+  if(loading){
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <TailSpin color="#000" height={50} width={50} />
+      </div>
+    )
+  }
 
   return (
     <div className="container w-full min-h-screen px-6 py-4">
