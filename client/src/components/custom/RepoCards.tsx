@@ -29,7 +29,7 @@ const RepoCards: React.FC<{ repo: Repo }> = ({ repo }) => {
             </div>
 
             {/* Description */}
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+            <p className="text-sm text-start text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
                 {repo.description || 'No description provided.'}
             </p>
 

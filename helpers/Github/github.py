@@ -27,28 +27,22 @@ class github:
         else:
             return False
 
-    def get_repos(self):
+    def get_repos(self,  per_page=100, page=1):
         try:
-            url = f"{API_URL}/users/{self.username}/repos"
-
-            response = requests.get(url, headers=self.headers)
+            url = f"{API_URL}/user/repos"
+            params = {
+                 
+             "per_page": per_page,
+                 "page": page
+             }
+            response = requests.get(url, headers=self.headers, params=params)
             if response.status_code == 200:
-                data = response.json()
-
-                return data
+                return response.json()
             else:
+                print(f"Error: {response.status_code}, {response.text}")
                 return False
         except Exception as e:
             print(str(e))
-            return False
-
-    def get_repo(self, reponame: str):
-        url = f"{API_URL}/repos/{self.username}/{reponame}"
-        response = requests.get(url, headers=self.headers)
-        if response.status_code == 200:
-            data = response.json()
-            return data
-        else:
             return False
 
     def get_branches(self, reponame):

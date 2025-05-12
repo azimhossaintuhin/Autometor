@@ -153,7 +153,9 @@ const RepoCiCD = () => {
               e.preventDefault()
               createWorkflow()
               createEnvVariables()
-            }}>
+            }}
+            method='POST'
+            >
               <div className='w-full p-2 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-5'>
                 <div className="flex flex-col justify-start mb-3">
                   <label htmlFor="framework" className='text-slate-700 font-bold mb-1'>Framework</label>
